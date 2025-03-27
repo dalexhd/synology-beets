@@ -1,20 +1,50 @@
+# Use Debian Bullseye as our base
 FROM debian:bullseye
 
-# 1. Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-      git build-essential python3 python3-dev python3-pip ffmpeg \
-      libessentia-dev essentia-examples \
-      && rm -rf /var/lib/apt/lists/*
+# 1. Install system/build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    build-essential \
+    python3 \
+    python3-pip \
+    python3-dev \
+    ffmpeg \
+    cmake \
+    libsamplerate0-dev \
+    libfftw3-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libavutil-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# 2. Install beets + plugins (xtractor, spotify, discogs, watchdog, etc.)
-RUN pip3 install --no-cache-dir beets beets-xtractor beets-spotify beets-discogs watchdog
+# 2. Clone and build Essentia from source (with xtractor)
+RUN git clone --depth 1 https://github.com/MTG/essentia.git /essentia
+WORKDIR /essentia
 
-# 3. Create a working directory
+# Create a build directory and compile
+RUN mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_EXAMPLES=ON \
+          -DBUILD_TESTS=OFF \
+          .. && \
+    make -j"$(nproc)" && \
+    make install && \
+    ldconfig
+
+# 3. Return to a working directory for the app
 WORKDIR /app
 
-# 4. Copy the watch script
+# 4. Install beets + relevant plugins
+#    (beets-xtractor plugin will call the 'xtractor' binary we just built)
+RUN pip3 install --no-cache-dir \
+    beets \
+    beets-xtractor \
+    beets-spotify \
+    beets-discogs \
+    watchdog
+
+# 5. Copy your watch script (optional)
 COPY watch.py /app/watch.py
 
-# 5. Default command: run the watch script
+# 6. Default command to run the watch script
 CMD ["python3", "/app/watch.py"]
