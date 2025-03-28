@@ -5,12 +5,13 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: beets_watcher
+    pull_policy: always
     restart: always
     volumes:
       # If you want to use relative paths:
-      - /volume1/docker/beets/config:/config
+      - ./config:/config
       # Or if you'd rather use absolute NAS paths:
-      - /volume1/music/unsorted:/music_unsorted
-      - /volume1/music/organized:/music_organized
+      - ./music/unsorted:/music_unsorted
+      - ./music/organized:/music_organized
     environment:
       - TZ=Europe/Madrid
