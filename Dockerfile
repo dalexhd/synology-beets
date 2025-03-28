@@ -1,22 +1,40 @@
-# Step 1: Use the pre-built Essentia image as the base
 FROM mtgupf/essentia:latest
 
-# Step 2: Install necessary packages and Python plugins
+# 1) Install required packages + python libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip python3-dev ffmpeg && \
-    pip3 install --no-cache-dir \
-        beets \
+    python3.9 python3.9-dev python3.9-distutils exiftool ffmpeg curl && \
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.9 && \
+    python3.9 -m pip install --no-cache-dir \
+        git+https://github.com/beetbox/beets.git \
+        pyacoustid \
+        requests \
+        discogs-client \
+        pylast \
         beets-xtractor \
         "beets[spotify]" \
+        "beets[deezer]" \
+        "beets[inline]" \
         "beets[discogs]" \
-        watchdog && \
+        "beets[info]" \
+        "beets[fetchart]" \
+        "beets[embedart]" \
+        "beets[lastgenre]" \
+        "beets[lyrics]" \
+        watchdog \
+        beautifulsoup4 \
+        langdetect && \
+    apt-get remove -y python3-pip && \
     rm -rf /var/lib/apt/lists/* /root/.cache/pip
 
-# Step 3: Set up the working directory
+# 2) Create a folder for our custom plugins and scripts
 WORKDIR /app
+RUN mkdir -p /app/plugins
 
-# Step 4: Copy your watch script
+# 3) Copy custom plugin + watch script if you want
 COPY watch.py /app/watch.py
+COPY config/plugins/comment.py /app/plugins/comment.py
+COPY config/plugins/chroma.py /app/plugins/chroma.py
+COPY config/plugins/spotify.py /app/plugins/spotify.py
 
-# Step 5: Default command to run the watch script
-CMD ["python3", "/app/watch.py"]
+# 4) By default, do nothing (or run a sleep).
+CMD ["python3.9", "/app/watch.py"]
