@@ -7,11 +7,22 @@ services:
     container_name: beets_watcher
     pull_policy: always
     restart: always
+    env_file:
+      - .env
     volumes:
       # If you want to use relative paths:
-      - ./config:/config
+      - ./src/config:${BEETS_CONFIG}
+      - ./src/plugins:${PLUGINS_PATH}
+      - ./data/tmp:/tmp
       # Or if you'd rather use absolute NAS paths:
-      - ./music/unsorted:/music_unsorted
-      - ./music/organized:/music_organized
+      - ./data/beets/logs:${LOGS_PATH}
+      - ./data/beets/database:${DATABASE_PATH}
+      - ./data/music/unsorted:${UNSORTED_DIR}
+      - ./data/music/sorted:${SORTED_DIR}
+      # Bind the directory
+      # - ./data/beets/logs:${LOGS_PATH%/*}
+      # - ./data/beets/library:${DATABASE_PATH%/*}
+    ports:
+      - 8337:8337
     environment:
       - TZ=Europe/Madrid

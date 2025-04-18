@@ -1,0 +1,45 @@
+
+directory: ${SORTED_DIR}
+library: ${DATABASE_PATH}/beets.db
+
+pluginpath:
+  - ${PLUGINS_PATH}
+
+import:
+  move: yes
+  write: yes
+  copy: no
+  quiet: yes                # Let me confirm matches if needed
+  timid: no
+  default_action: apply
+  quiet_fallback: asis
+  languages:
+    - es
+    - en
+
+item_fields:
+  first_albumartist: albumartist.split(",")[0].strip()
+  first_genre: genre.split(",")[0].strip()
+  smart_label_and_catalog_for_path: |
+    result = ""
+    if len(label) > 0 and len(catalognum) > 0:
+      result += " @ "
+    if len(catalognum) > 0:
+      result += catalognum
+    if len(label) > 0:
+      result = label + result
+    return " [" + result + "]" if len(result) > 0 else ""
+  smart_disc_and_track_numbers: |
+    result = ""
+    if albumtype.capitalize() != "Single" and albumtype.capitalize() != "Remix":
+      if tracktotal > 1:
+        result += str(track).zfill(len(str(tracktotal))) if tracktotal >= 10 else str(track)
+      if disctotal > 1 and tracktotal > 1:
+        result = "-" + result
+      if disctotal > 1:
+        result = str(disc).zfill(len(str(disctotal))) if disctotal >= 10 else str(disc) + result
+    return result + (" " if len(result) > 0 else "")
+
+paths:
+  default: $first_albumartist/$album%aunique{} ($year)$smart_label_and_catalog_for_path/$smart_disc_and_track_numbers$title
+  singleton: $first_albumartist/$album%aunique{} ($year)$smart_label_and_catalog_for_path/$title

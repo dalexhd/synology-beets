@@ -1,0 +1,38 @@
+types:
+  rating: int
+  bpm: float
+
+edit:
+  itemfields:
+    - albumartist
+    - album
+    - disc
+    - disctotal
+    - albumtype
+    - comp
+    - year
+    - label
+    - catalognum
+    - cover_art_url
+    - artist
+    - track
+    - tracktotal
+    - title
+    - genre
+    - rating
+    - bpm
+    - key
+    - comments
+    - lyrics
+  albumfields:
+    - albumartist
+    - album
+    - disctotal
+    - albumtype
+    - label
+    - catalognum
+    - cover_art_url
+    - comp
+    - year
+    - genre
+    - comments

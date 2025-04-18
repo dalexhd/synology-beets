@@ -1,0 +1,65 @@
+# xtractor plugin - local analysis (bpm, key, loudness, etc.)
+xtractor:
+  auto: yes
+  overwrite: yes
+  command: xtractor
+  fields:
+    - bpm
+    - key
+    - loudness
+
+web:
+    host: 0.0.0.0
+
+# fetchart + embedart
+fetchart:
+  auto: yes
+
+embedart:
+  auto: yes
+
+discogs:
+  user_token: ${DISCOGS_USER_TOKEN}
+
+spotify:
+  client_id: ${SPOTIFY_CLIENT_ID}
+  client_secret: ${SPOTIFY_CLIENT_SECRET}
+  fallback: yes
+  show_failures: yes
+
+lastgenre:
+  auto: yes
+  fallback: "Unknown"
+  source: album
+  force: yes
+
+lyrics:
+  auto: yes
+  genius_api_key: ${GENIUS_API_KEY}
+
+musicbrainz:
+  source_weight: 0.4
+  extra_tags: [catalognum, label, year]
+  external_ids:
+    discogs: true
+    spotify: true
+    bandcamp: true
+    beatport: true
+    tidal: true
+
+beatport4:
+  source_weight: 1.0
+  art: true
+  art_overwrite: false
+
+# # Our custom plugin config
+# comment:
+#   fields: [spotify_track_popularity, spotify_genres, spotify_tempo]
+#   comment_separator: ', '
+#   existing_comment_separator: ' | '
+#   threshold_popularity: 40
+#   map_spotify_tempo_to_bpm: true
+#   map_xtractor_key: true
+
+# chroma:
+#   auto: yes

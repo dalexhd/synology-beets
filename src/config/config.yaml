@@ -1,0 +1,30 @@
+logging:
+  level: debug
+
+plugins:
+  - info
+  - the
+  - inline
+  - web
+  - fuzzy
+  - duplicates
+  - unimported
+  - importadded
+  - lastgenre
+  - types
+  - edit
+  # - chroma # pyacoustid
+  - convert
+  - replaygain
+  # - beatport4
+  - spotify
+  - embedart
+  - fetchart
+  # - subsonicupdate
+
+include:
+  - .configs/files.yaml
+  - .configs/data.yaml
+  - .configs/quality.yaml
+  - .configs/sources.yaml
+  - .configs/display.yaml

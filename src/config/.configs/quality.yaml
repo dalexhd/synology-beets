@@ -1,0 +1,49 @@
+convert:
+  tmpdir: /tmp
+  formats:
+    flac:
+      command: ffmpeg -i $source $dest -y
+    aiff:
+      command: ffmpeg -i $source -write_id3v2 1 $dest -y
+    aac:
+      command: ffmpeg -i $source -c:a aac -b:a 256k $dest -y
+    mp3:
+      command: ffmpeg -i $source -c:a mp3 -b:a 320k $dest -y
+  format: flac
+  no_convert: format:flac, format:mp3, format:aac
+  auto: true
+  delete_originals: true
+  copy_album_art: true
+  embed: true
+
+replaygain:
+  auto: true
+  backend: ffmpeg
+  # backend: gstreamer
+  overwrite: true
+
+importadded:
+  preserve_mtimes: true
+  preserve_write_mtimes: true
+
+lastgenre:
+  count: 3
+  source: track
+
+bpmanalyser:
+  auto: true
+  write: true
+
+embedart:
+  maxwidth: 1280
+  remove_art_file: false
+
+fetchart:
+  quality: 100
+  sources:
+    - filesystem
+    - itunes
+    - amazon
+    - spotify
+    - "*"
+  high_resolution: true
