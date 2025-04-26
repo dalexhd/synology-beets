@@ -42,7 +42,8 @@ RUN python3.9 -m pip install --no-cache-dir \
 # ----------------------------------------------------------------------------
 WORKDIR /app
 ENV PLUGINS_PATH=/app/plugins \
-    SCRIPTS_PATH=/app/scripts
+    SCRIPTS_PATH=/app/scripts \
+    BEETS_CONFIG=/app/config
 
 RUN mkdir -p $PLUGINS_PATH $SCRIPTS_PATH /app/logs /app/data /app/config && \
     chmod -R 777 /app/logs /app/data /app/config
@@ -52,6 +53,9 @@ RUN mkdir -p $PLUGINS_PATH $SCRIPTS_PATH /app/logs /app/data /app/config && \
 # ----------------------------------------------------------------------------
 # COPY src/plugins/*.py $PLUGINS_PATH/
 COPY src/scripts/watch.py $SCRIPTS_PATH/
+COPY src/config $BEETS_CONFIG/
+COPY src/config/.configs $BEETS_CONFIG/.configs
+
 
 # ----------------------------------------------------------------------------
 # 6. Default command
