@@ -26,10 +26,6 @@ importadded:
   preserve_mtimes: true
   preserve_write_mtimes: true
 
-lastgenre:
-  count: 3
-  source: track
-
 bpmanalyser:
   auto: true
   write: true

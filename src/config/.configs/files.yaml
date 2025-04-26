@@ -41,5 +41,5 @@ item_fields:
     return result + (" " if len(result) > 0 else "")
 
 paths:
-  default: $first_albumartist/$album%aunique{} ($year)$smart_label_and_catalog_for_path/$smart_disc_and_track_numbers$title
-  singleton: $first_albumartist/$album%aunique{} ($year)$smart_label_and_catalog_for_path/$title
+  default: $genre/$first_albumartist/$album%aunique{} ($year)$smart_label_and_catalog_for_path/$smart_disc_and_track_numbers$title
+  singleton: $genre/$first_albumartist/$album%aunique{} ($year)$smart_label_and_catalog_for_path/$title

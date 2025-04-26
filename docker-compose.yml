@@ -13,7 +13,6 @@ services:
       # If you want to use relative paths:
       - ./src/config:${BEETS_CONFIG}
       - ./src/plugins:${PLUGINS_PATH}
-      - ./data/tmp:/tmp
       # Or if you'd rather use absolute NAS paths:
       - ./data/beets/logs:${LOGS_PATH}
       - ./data/beets/database:${DATABASE_PATH}

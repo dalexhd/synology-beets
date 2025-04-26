@@ -13,6 +13,11 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# Track processed directories to avoid double processing
+processed_directories = set()
+# Lock for thread-safe operations on processed_directories
+processed_lock = threading.Lock()
+
 def load_config_with_env_variables(config_path):
     """
     Load a YAML configuration file, interpolate environment variables, 
@@ -126,18 +131,67 @@ class FolderHandler(FileSystemEventHandler):
         time.sleep(2)  # give filesystem time to settle
 
         path = event.src_path
+        
         if event.is_directory:
             logging.info(f"[Watcher] New folder detected: {path}")
+            # Process the directory
+            self.import_path(path, is_directory=True)
+            
+            # Add this directory to processed directories
+            with processed_lock:
+                processed_directories.add(path)
+                logging.info(f"[Watcher] Added directory to processed list: {path}")
         else:
+            # Check if this file is in a directory we've already processed
+            parent_dir = os.path.dirname(path)
+            with processed_lock:
+                if parent_dir in processed_directories:
+                    logging.info(f"[Watcher] Skipping file in already processed directory: {path}")
+                    return
+                
+                # Also check if any parent directory has been processed
+                for processed_dir in processed_directories:
+                    if path.startswith(processed_dir + os.sep):
+                        logging.info(f"[Watcher] Skipping file in already processed parent directory: {path}")
+                        return
+            
             logging.info(f"[Watcher] New file detected: {path}")
-        self.import_path(path)
+            self.import_path(path, is_directory=False)
 
-    def import_path(self, path):
+    def import_path(self, path, is_directory=False):
         logging.info(f"[Watcher] Running beets import on {path}")
-        cmd = ["beet", "-vvvvv", "-c", BEETS_CONFIG_TEMP, "import", "--from-scratch", "-s", path]
+        
+        # Base command with configuration
+        cmd = ["beet", "-vvvvv", "-c", BEETS_CONFIG_TEMP, "import"]
+        
+        # Add specific options based on whether it's a file or directory
+        if is_directory:
+            # For directories, use recursive import with album grouping
+            cmd.extend(["-qga", path])
+            logging.info("[Watcher] Processing as directory with album grouping")
+        else:
+            # For individual files, use singleton mode (no album grouping)
+            if path.lower().endswith(('.mp3', '.flac', '.m4a', '.ogg', '.wav')):
+                cmd.extend(["-qs", path])
+                logging.info("[Watcher] Processing as individual audio file in singleton mode")
+            else:
+                logging.info(f"[Watcher] Skipping non-audio file: {path}")
+                return
+        
         logging.info(f"[Watcher] Command: {' '.join(cmd)}")
-        with open(f"{LOGS_PATH}/beets.log", "a") as beet_log:
-            subprocess.run(cmd, check=True, stdout=beet_log, stderr=beet_log)
+        try:
+            with open(f"{LOGS_PATH}/beets.log", "a") as beet_log:
+                subprocess.run(cmd, check=True, stdout=beet_log, stderr=beet_log)
+            logging.info(f"[Watcher] Successfully imported: {path}")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"[Watcher] Failed to import {path}: {e}")
+            
+            # If a directory import fails, don't mark it as processed
+            if is_directory:
+                with processed_lock:
+                    if path in processed_directories:
+                        processed_directories.remove(path)
+                        logging.info(f"[Watcher] Removed failed directory from processed list: {path}")
 
 def run_beet_web_in_background():
     """
@@ -153,6 +207,11 @@ def run_beet_web_in_background():
     web_thread.start()
 
 def main():
+    # Start the web interface in the background
+    # run_beet_web_in_background()
+    # logging.info("[Watcher] Beets web interface started in background")
+    
+    # Set up folder watching
     handler = FolderHandler()
     observer = Observer()
     observer.schedule(handler, UNSORTED_DIR, recursive=True)
@@ -166,5 +225,4 @@ def main():
     observer.join()
 
 if __name__ == "__main__":
-    run_beet_web_in_background()
     main()

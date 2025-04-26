@@ -18,8 +18,23 @@ fetchart:
 embedart:
   auto: yes
 
+lastgenre:
+  auto: yes
+  fallback: "Unknown"
+  whitelist: no
+  prefer_specific: yes
+  source: track
+  force: yes
+  keep_existing: yes
+  extended_debug: yes
+
+mbsync:
+  genres: yes
+
 discogs:
   user_token: ${DISCOGS_USER_TOKEN}
+  source_weight: 0.4
+  genres: yes
 
 spotify:
   client_id: ${SPOTIFY_CLIENT_ID}
@@ -27,19 +42,16 @@ spotify:
   fallback: yes
   show_failures: yes
 
-lastgenre:
-  auto: yes
-  fallback: "Unknown"
-  source: album
-  force: yes
-
 lyrics:
   auto: yes
   genius_api_key: ${GENIUS_API_KEY}
 
 musicbrainz:
   source_weight: 0.4
-  extra_tags: [catalognum, label, year]
+  user: dalexhd
+  pass: ${MUSICBRAINZ_PASS}
+  extra_tags: [catalognum, label, year, genre]
+  genres: yes
   external_ids:
     discogs: true
     spotify: true
@@ -51,6 +63,19 @@ beatport4:
   source_weight: 1.0
   art: true
   art_overwrite: false
+
+
+# Our custom genre fallback plugin
+genrefallback:
+  fallback_for: "Unknown"
+  separator: ", "
+  max_genres: 3
+  retry_delay: 2
+  max_retries: 3
+  overwrite: false
+  spotify:
+    client_id: ${SPOTIFY_CLIENT_ID}
+    client_secret: ${SPOTIFY_CLIENT_SECRET}
 
 # # Our custom plugin config
 # comment:

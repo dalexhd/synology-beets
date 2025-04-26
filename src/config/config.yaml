@@ -2,24 +2,24 @@ logging:
   level: debug
 
 plugins:
+  - lastgenre
   - info
   - the
   - inline
-  - web
   - fuzzy
   - duplicates
   - unimported
-  - importadded
-  - lastgenre
+  - mbsync
   - types
   - edit
-  # - chroma # pyacoustid
   - convert
   - replaygain
   # - beatport4
-  - spotify
+  # - spotify
   - embedart
   - fetchart
+  # - genrefallback
+  - importadded
   # - subsonicupdate
 
 include:
